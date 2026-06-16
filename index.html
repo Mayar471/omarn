@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق النبك - واجهة الصفحات المنفصلة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        body { font-family: 'Tajawal', sans-serif; overflow: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .page-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen antialiased">
+
+    <!-- إطار الهاتف الذكي -->
+    <div class="w-full max-w-md h-[850px] bg-white rounded-[40px] shadow-2xl border-[12px] border-gray-900 relative overflow-hidden flex flex-col">
+        
+        <!-- 1. الصفحة الرئيسية (Home Screen) -->
+        <div id="home-screen" class="flex flex-col h-full overflow-hidden page-screen">
+            <!-- شريط الحالة -->
+            <div class="w-full h-6 bg-white flex justify-between items-center px-6 text-xs pt-4">
+                <span class="font-bold">16:23</span>
+                <div class="flex items-center gap-1">
+                    <i class="fas fa-wifi"></i>
+                    <i class="fas fa-battery-three-quarters"></i>
+                </div>
+            </div>
+
+            <!-- هيدر الرئيسية -->
+            <header class="p-4 bg-white border-b border-gray-50 relative">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2 relative">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div onclick="toggleLocationDropdown()" class="cursor-pointer select-none">
+                            <p class="text-[10px] text-gray-400">التوصيل إلى <i class="fas fa-chevron-down text-[8px] mr-0.5 text-gray-500"></i></p>
+                            <p id="current-location-text" class="text-xs font-bold text-gray-800">المنزل  </p>
+                        </div>
+
+                        <!-- القائمة المنسدلة للمواقع -->
+                        <div id="location-dropdown" class="absolute top-12 right-0 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl p-2 hidden z-50 transition-all duration-200">
+                            <div id="dropdown-locations-list" class="space-y-0.5"></div>
+                            <div class="border-t my-1 border-gray-50"></div>
+                            <button onclick="openAddNewLocation()" class="w-full text-right text-xs p-2.5 text-orange-500 hover:bg-orange-50 rounded-xl font-bold flex items-center">
+                                <i class="fas fa-plus-circle ml-2"></i> إضافة موقع جديد...
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleCartModal()" class="relative p-2 bg-gray-50 rounded-full">
+                        <i class="fas fa-shopping-bag text-gray-700"></i>
+                        <span id="cart-count-badge" class="absolute -top-1 -right-1 bg-orange-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" placeholder="ابحث عن وجبتك..." class="w-full bg-gray-100 rounded-xl py-2 pr-9 pl-4 text-xs focus:outline-none">
+                </div>
+            </header>
+
+            <!-- محتوى الرئيسية -->
+            <main class="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar pb-20">
+                <!-- بنر العرض -->
+                <section class="bg-gradient-to-l from-orange-500 to-amber-400 rounded-2xl p-4 text-white relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h3 class="font-bold text-lg">توصيل مجاني</h3>
+                        <p class="text-[10px] opacity-90">بمناسبة الانطلاق في مدينة النبك</p>
+                    </div>
+                    <i class="fas fa-motorcycle absolute -left-2 -bottom-2 text-6xl opacity-20"></i>
+                </section>
+
+                <!-- الأقسام -->
+                <div class="flex justify-between gap-2 text-center">
+                    <button onclick="filterStores('most-requested')" class="flex-1"><div class="bg-red-50 p-3 rounded-2xl mb-1 text-red-500"><i class="fas fa-fire"></i></div><span class="text-[10px] font-bold">الأكثر طلبا</span></button>
+                    <button onclick="filterStores('restaurant')" class="flex-1"><div class="bg-orange-50 p-3 rounded-2xl mb-1 text-orange-500"><i class="fas fa-utensils"></i></div><span class="text-[10px] font-bold">مطاعم</span></button>
+                    <button onclick="filterStores('supermarket')" class="flex-1"><div class="bg-blue-50 p-3 rounded-2xl mb-1 text-blue-500"><i class="fas fa-shopping-basket"></i></div><span class="text-[10px] font-bold">ماركت</span></button>
+                    <button onclick="filterStores('vegetables')" class="flex-1"><div class="bg-green-50 p-3 rounded-2xl mb-1 text-green-500"><i class="fas fa-leaf"></i></div><span class="text-[10px] font-bold">خضار</span></button>
+                    <button onclick="filterStores('sweets')" class="flex-1"><div class="bg-pink-50 p-3 rounded-2xl mb-1 text-pink-500"><i class="fas fa-ice-cream"></i></div><span class="text-[10px] font-bold">حلويات</span></button>
+                    <button onclick="filterStores('perfume')" class="flex-1"><div class="bg-purple-50 p-3 rounded-2xl mb-1 text-purple-500"><i class="fas fa-spray-can"></i></div><span class="text-[10px] font-bold">عطورات</span></button>
+                </div>
+
+                <!-- قائمة المتاجر -->
+                <div id="stores-container" class="space-y-3"></div>
+            </main>
+        </div>
+
+        <!-- 2. صفحة المتجر المستقلة (Store Detail Screen) -->
+        <div id="store-screen" class="absolute inset-0 bg-white z-20 hidden flex flex-col page-screen">
+            <div class="p-4 flex items-center justify-between border-b bg-white">
+                <button onclick="navigateTo('home-screen')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <img id="store-screen-logo" src="" alt="شعار المتجر" class="w-7 h-7 rounded-lg object-cover hidden">
+                    <h2 id="store-title" class="font-bold text-gray-800">اسم المتجر</h2>
+                </div>
+                <div class="w-10"></div>
+            </div>
+            <div id="menu-container" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-24"></div>
+            <button id="floating-cart-btn" onclick="toggleCartModal()" class="absolute bottom-20 left-1/2 -translate-x-1/2 w-[90%] bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-xl hidden z-30">
+                عرض السلة والدفع
+            </button>
+        </div>
+
+        <!-- 3. صفحة الملف الشخصي (Profile Screen) -->
+        <div id="profile-screen" class="absolute inset-0 bg-gray-50 z-20 hidden flex flex-col page-screen">
+            <div class="p-4 flex items-center justify-between border-b bg-white">
+                <button onclick="navigateTo('home-screen')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <h2 class="font-bold text-gray-800">الملف الشخصي</h2>
+                <div class="w-10"></div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-20">
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 text-center">
+                    <div class="w-20 h-20 bg-orange-500 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md shadow-orange-100">أ</div>
+                    <h3 class="font-bold text-gray-800 text-base">أحمد النبكي</h3>
+                    <p class="text-xs text-gray-500 mt-1 dir-ltr"><i class="fas fa-phone-alt text-gray-400 ml-1"></i> +963 933 123 456</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-xs text-gray-800"><i class="fas fa-map-marked-alt text-orange-500 ml-1.5"></i> عناوين التوصيل المحفوظة</h4>
+                        <button onclick="openAddNewLocation()" class="text-[11px] text-orange-500 font-bold"><i class="fas fa-plus"></i> أضف جديد</button>
+                    </div>
+                    <div id="profile-locations-list" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                    <h4 class="font-bold text-xs text-gray-800 mb-3"><i class="fas fa-history text-orange-500 ml-1.5"></i> سجل الطلبات السابقة</h4>
+                    <div id="past-orders-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. صفحة الطلبات الحالية (Current Orders Screen) -->
+        <div id="orders-screen" class="absolute inset-0 bg-gray-50 z-20 hidden flex flex-col page-screen">
+            <div class="p-4 flex items-center justify-between border-b bg-white">
+                <button onclick="navigateTo('home-screen')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <h2 class="font-bold text-gray-800">الطلبات الحالية</h2>
+                <div class="w-10"></div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-20">
+                <div id="current-orders-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- شريط التنقل السفلي -->
+        <nav class="absolute bottom-0 w-full h-16 bg-white border-t flex justify-around items-center z-40">
+            <button id="nav-home" onclick="navigateTo('home-screen')" class="text-orange-500 flex flex-col items-center nav-btn"><i class="fas fa-home text-lg"></i><span class="text-[9px] mt-1 font-bold">الرئيسية</span></button>
+            <button id="nav-orders" onclick="navigateTo('orders-screen')" class="text-gray-400 flex flex-col items-center nav-btn"><i class="fas fa-receipt text-lg"></i><span class="text-[9px] mt-1">طلباتي</span></button>
+            <button id="nav-profile" onclick="navigateTo('profile-screen')" class="text-gray-400 flex flex-col items-center nav-btn"><i class="fas fa-user text-lg"></i><span class="text-[9px] mt-1">حسابي</span></button>
+        </nav>
+
+        <!-- 4. نافذة السلة (Cart Modal) -->
+        <div id="cart-modal" class="absolute inset-0 bg-black/50 z-[60] hidden flex flex-col justify-end">
+            <div class="bg-white rounded-t-[30px] p-5 h-[60%] flex flex-col shadow-2xl">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h3 class="font-bold text-lg"><i class="fas fa-shopping-cart text-orange-500 ml-2"></i> سلة المشتريات</h3>
+                    <button onclick="toggleCartModal()" class="text-2xl text-gray-400">&times;</button>
+                </div>
+                <div id="cart-items-list" class="flex-1 overflow-y-auto space-y-3 no-scrollbar"></div>
+                <div class="pt-4 border-t space-y-2 mt-4">
+                    <div class="flex justify-between text-gray-500"><span>المجموع:</span><span id="total-price" class="font-bold text-gray-800">0 ل.س</span></div>
+                    <button onclick="confirmOrder()" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold mt-2 shadow-lg">تأكيد الطلب</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. نافذة منبثقة لإضافة موقع جديد -->
+        <div id="add-location-modal" class="absolute inset-0 bg-black/50 z-[70] hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-5 w-full max-w-xs shadow-2xl">
+                <h4 class="font-bold text-gray-800 mb-3 text-sm"><i class="fas fa-map-marked-alt text-orange-500 ml-1"></i> إضافة عنوان جديد</h4>
+                <input id="new-location-input" type="text" placeholder="مثال: النبك، جانب المشفى الوطني" class="w-full bg-gray-100 border border-gray-200 rounded-xl p-3 text-xs mb-4 focus:outline-none focus:border-orange-500">
+                <div class="flex gap-2">
+                    <button onclick="saveNewLocation()" class="flex-1 bg-orange-500 text-white py-2 rounded-xl text-xs font-bold shadow-md">حفظ</button>
+                    <button onclick="closeAddNewLocation()" class="flex-1 bg-gray-100 text-gray-500 py-2 rounded-xl text-xs font-bold">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. نافذة عرض تفاصيل الطلب السابق -->
+        <div id="order-detail-modal" class="absolute inset-0 bg-black/50 z-[70] hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-5 w-full max-w-xs shadow-2xl flex flex-col max-h-[70%]">
+                <div class="flex justify-between items-center border-b pb-3 mb-3">
+                    <h4 id="modal-order-title" class="font-bold text-gray-800 text-sm">تفاصيل الطلب</h4>
+                    <button onclick="closeOrderDetailModal()" class="text-xl text-gray-400 font-bold">&times;</button>
+                </div>
+                <div id="modal-order-items" class="flex-1 overflow-y-auto space-y-2 no-scrollbar mb-3"></div>
+                <div class="border-t pt-3 flex justify-between text-xs">
+                    <span class="font-bold text-gray-600">إجمالي المدفوع:</span>
+                    <span id="modal-order-total" class="font-bold text-orange-600">0 ل.س</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // داتا المتاجر مع صور الوجبات المحدثة وحقول معالجة الصور
+        const storesData = [
+    { 
+        id: 1, 
+        name: "مطعم و استراحةالرصافة", 
+        type: "restaurant", 
+        rating: "4.8", 
+        logo: "images/shop1.jpeg", 
+        menu: [
+            { id: "m1", name: "وجبة كباب مشوي مع الخضار الطازجة", price: 25000, image: "images/product1.jpeg" }
+        ] 
+    },
+    { 
+        id: 2, 
+        name: "كرز فريش - Karaz Fresh", 
+        type: "vegetables", 
+        rating: "4.6", 
+        logo: "images/shop2.jpeg", 
+        menu: [
+            { id: "m2", name: "عرنوس ذرة صفراء طازج", price: 15000, image: "images/product2.jpeg" }
+        ] 
+    },
+    { 
+        id: 3, 
+        name: "بوظة أمية - Omaya Ice Cream", 
+        type: "sweets", 
+        rating: "4.9", 
+        logo: "images/shop3.jpeg", 
+        menu: [
+            { id: "m3", name: "قالب آيس كريم فاخر باللوتس والفراولة", price: 90000, image: "images/product3.jpeg" }
+        ] 
+    },
+    { 
+        id: 4, 
+        name: "فول وفتة - Fool & Fatteh", 
+        type: "restaurant", 
+        rating: "4.5", 
+        logo: "images/shop4.jpeg", 
+        menu: [
+            { id: "m4", name: "وجبة فلافل عربي مشكلة مع المخللات والطحينة", price: 18000, image: "images/product4.jpeg" }
+        ] 
+    },
+    { 
+        id: 5, 
+        name: "سناك Better 3", 
+        type: "restaurant", 
+        rating: "4.7", 
+        logo: "images/shop5.jpeg", 
+        menu: [
+            { id: "m5", name: "برجر دجاج مقرمش (زنجر) مع البطاطا والصوص", price: 32000, image: "images/product5.jpeg" }
+        ] 
+    },
+    { 
+        id: 6, 
+        name: "تموينات حاج حسين", 
+        type: "supermarket", 
+        rating: "4.4", 
+        logo: "images/shop6.jpeg", 
+        menu: [
+            { id: "m6", name: "ساديا ميني شيف بوب كورن الدجاج", price: 14000, image: "images/product6.jpeg" }
+        ] 
+    },
+    { 
+        id: 7, 
+        name: "مطعم برجر B.", 
+        type: "restaurant", 
+        rating: "4.8", 
+        logo: "images/shop7.jpg", 
+        menu: [
+            { id: "m7", name: "وجبة برجر لحم دبل كلاسيك بالجبنة الذائبة والصوص", price: 45000, image: "images/product7 (1).png" }
+        ] 
+    },
+    { 
+        id: 8, 
+        name: "MR.B Perfume", 
+        type: "perfume", 
+        rating: "4.9", 
+        logo: "images/shop8.jpeg", 
+        menu: [
+            { id: "m8", name: "عطر MR.B Perfume Extreme سعة 50 مل", price: 85000, image: "images/product8.jpeg" }
+        ] 
+    }
+];
+
+        let locations = [
+            { name: "المنزل", icon: "fa-home" },
+            { name: "المزرعة", icon: "fa-building" },
+            { name: "العمل", icon: "fa-briefcase" }
+        ];
+
+        let pastOrders = [];
+        let currentOrders = [];
+        let cart = [];
+        let currentActiveStore = null;
+
+        function navigateTo(screenId) {
+            document.querySelectorAll('.page-screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.replace('text-orange-500', 'text-gray-400'));
+            if (screenId === 'home-screen') {
+                document.getElementById('nav-home').classList.replace('text-gray-400', 'text-orange-500');
+            } else if (screenId === 'profile-screen') {
+                document.getElementById('nav-profile').classList.replace('text-gray-400', 'text-orange-500');
+            } else if (screenId === 'orders-screen') {
+                document.getElementById('nav-orders').classList.replace('text-gray-400', 'text-orange-500');
+            }
+        }
+
+        function renderLocationsUI() {
+            const dropdownList = document.getElementById('dropdown-locations-list');
+            dropdownList.innerHTML = locations.map(loc => `
+                <button onclick="selectLocation('${loc.name}')" class="w-full text-right text-xs p-2.5 hover:bg-orange-50 rounded-xl flex items-center justify-between text-gray-700">
+                    <span><i class="fas ${loc.icon} text-gray-400 ml-2"></i>${loc.name.replace('النبك، ', '')}</span>
+                </button>
+            `).join('');
+
+            const profileList = document.getElementById('profile-locations-list');
+            profileList.innerHTML = locations.map(loc => `
+                <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <i class="fas ${loc.icon} text-orange-400 text-xs"></i>
+                        <span class="text-xs text-gray-700 font-medium">${loc.name}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPastOrdersUI() {
+            const container = document.getElementById('past-orders-list');
+            if (pastOrders.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-xs text-center py-3">لا توجد طلبات سابقة حتى الآن.</p>`;
+                return;
+            }
+            container.innerHTML = pastOrders.map(order => `
+                <div onclick="viewOrderDetails('${order.id}')" class="p-3 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center hover:border-orange-200 transition cursor-pointer">
+                    <div class="space-y-1">
+                        <h5 class="font-bold text-xs text-gray-800">${order.store}</h5>
+                        <p class="text-[10px] text-gray-400">رقم الطلب: #${order.id} • ${order.date}</p>
+                    </div>
+                    <div class="text-left space-y-1">
+                        <span class="text-xs font-bold text-orange-500 block">${order.total.toLocaleString()} ل.س</span>
+                        <span class="text-[9px] text-gray-400 bg-white px-2 py-0.5 border rounded-full">تفاصيل <i class="fas fa-chevron-left text-[8px] mr-0.5"></i></span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCurrentOrdersUI() {
+            const container = document.getElementById('current-orders-list');
+            if (currentOrders.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-xs text-center py-8"><i class="fas fa-inbox text-2xl mb-2 block opacity-50"></i>لا توجد طلبات حالية.</p>`;
+                return;
+            }
+            container.innerHTML = currentOrders.map(order => {
+                const statusConfig = {
+                    'approved': { icon: 'fa-check-circle', color: 'bg-green-50 border-green-200', text: 'text-green-600', label: 'معتمد' },
+                    'preparing': { icon: 'fa-hourglass-half', color: 'bg-blue-50 border-blue-200', text: 'text-blue-600', label: 'قيد التحضير' },
+                    'on-way': { icon: 'fa-map-marked-alt', color: 'bg-orange-50 border-orange-200', text: 'text-orange-600', label: 'في الطريق' },
+                    'completed': { icon: 'fa-check-double', color: 'bg-green-100 border-green-300', text: 'text-green-700', label: 'مكتمل' }
+                };
+                const config = statusConfig[order.status] || statusConfig['approved'];
+                return `
+                    <div class="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition ${config.color}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 text-sm">${order.store}</h4>
+                                <p class="text-[11px] text-gray-500">رقم الطلب: #${order.id}</p>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-1 rounded-full ${config.text} ${config.color} flex items-center gap-1">
+                                <i class="fas ${config.icon} text-xs"></i> ${config.label}
+                            </span>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-3 space-y-2">
+                            <div class="flex justify-between text-xs text-gray-600">
+                                <span>المجموع:</span>
+                                <span class="font-bold text-orange-600">${order.total.toLocaleString()} ل.س</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-600">
+                                <span>الوقت المتبقي:</span>
+                                <span class="font-bold text-gray-700">${order.estimatedTime}</span>
+                            </div>
+                        </div>
+
+                        <button onclick="viewCurrentOrderDetails('${order.id}')" class="w-full mt-3 text-[11px] font-bold text-orange-500 py-2 hover:bg-orange-50 rounded-lg transition">
+                            عرض التفاصيل <i class="fas fa-chevron-left text-[9px] mr-1"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = pastOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            document.getElementById('modal-order-title').innerText = `تفاصيل طلب: ${order.store}`;
+            document.getElementById('modal-order-total').innerText = `${order.total.toLocaleString()} ل.س`;
+
+            const itemsContainer = document.getElementById('modal-order-items');
+            itemsContainer.innerHTML = order.items.map(item => `
+                <div class="flex flex-col bg-gray-50 p-2.5 rounded-xl text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-bold">${item.name} <span class="text-orange-500 text-[10px]">x${item.qty}</span></span>
+                        <span class="text-gray-600 font-medium">${(item.price * item.qty).toLocaleString()} ل.س</span>
+                    </div>
+                    ${item.note ? `<p class="text-[10px] text-orange-600 bg-orange-50/50 p-1 rounded font-medium"><i class="fas fa-comment-dots ml-1"></i>ملاحظة: ${item.note}</p>` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('order-detail-modal').classList.remove('hidden');
+        }
+
+        function viewCurrentOrderDetails(orderId) {
+            const order = currentOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            document.getElementById('modal-order-title').innerText = `تفاصيل طلب: ${order.store}`;
+            document.getElementById('modal-order-total').innerText = `${order.total.toLocaleString()} ل.س`;
+
+            const itemsContainer = document.getElementById('modal-order-items');
+            itemsContainer.innerHTML = order.items.map(item => `
+                <div class="flex flex-col bg-gray-50 p-2.5 rounded-xl text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-bold">${item.name} <span class="text-orange-500 text-[10px]">x${item.qty}</span></span>
+                        <span class="text-gray-600 font-medium">${(item.price * item.qty).toLocaleString()} ل.س</span>
+                    </div>
+                    ${item.note ? `<p class="text-[10px] text-orange-600 bg-orange-50/50 p-1 rounded font-medium"><i class="fas fa-comment-dots ml-1"></i>ملاحظة: ${item.note}</p>` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('order-detail-modal').classList.remove('hidden');
+        }
+
+        function closeOrderDetailModal() { document.getElementById('order-detail-modal').classList.add('hidden'); }
+        function toggleLocationDropdown() { document.getElementById('location-dropdown').classList.toggle('hidden'); }
+        function selectLocation(locationName) {
+            document.getElementById('current-location-text').innerText = locationName;
+            document.getElementById('location-dropdown').classList.add('hidden');
+        }
+        function openAddNewLocation() {
+            document.getElementById('location-dropdown').classList.add('hidden');
+            document.getElementById('add-location-modal').classList.remove('hidden');
+            document.getElementById('new-location-input').focus();
+        }
+        function closeAddNewLocation() {
+            document.getElementById('add-location-modal').classList.add('hidden');
+            document.getElementById('new-location-input').value = '';
+        }
+
+        function saveNewLocation() {
+            const inputVal = document.getElementById('new-location-input').value.trim();
+            if (inputVal !== '') {
+                locations.push({ name: inputVal, icon: "fa-map-marker-alt" });
+                renderLocationsUI();
+                selectLocation(inputVal);
+                closeAddNewLocation();
+            } else { alert("الرجاء إدخال عنوان صحيح."); }
+        }
+
+        function renderStores(data, isProducts = false) {
+            const container = document.getElementById('stores-container');
+
+            if (isProducts) {
+                container.innerHTML = data.map(product => `
+                    <div onclick="openStore(${product.storeId})" class="flex flex-col items-center p-4 bg-white rounded-2xl border border-gray-100 hover:border-orange-200 transition cursor-pointer shadow-sm">
+                        <img src="${product.image}" alt="${product.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 mb-3">
+                        <h4 class="font-bold text-xs text-gray-800 text-center mb-1 line-clamp-2">${product.name}</h4>
+                        <p class="text-orange-600 font-bold text-xs mb-2">${product.price.toLocaleString()} ل.س</p>
+                        <p class="text-[10px] text-gray-500 font-medium">${product.storeName}</p>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = data.map(store => `
+                    <div onclick="openStore(${store.id})" class="flex items-center gap-3 p-3 border rounded-2xl bg-white hover:border-orange-200 transition cursor-pointer shadow-sm">
+                        <img src="${store.logo}" alt="${store.name}" class="w-14 h-14 bg-gray-50 rounded-xl object-cover border border-gray-100">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm text-gray-800">${store.name}</h4>
+                            <div class="flex items-center gap-2 text-[10px] text-gray-400 mt-1">
+                                <span class="text-amber-500"><i class="fas fa-star"></i> ${store.rating}</span>
+                                <span>• 20-30 دقيقة</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left text-gray-300 text-xs"></i>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openStore(id) {
+            const store = storesData.find(s => s.id === id);
+            currentActiveStore = store; 
+            document.getElementById('store-title').innerText = store.name;
+            
+            const storeHeaderLogo = document.getElementById('store-screen-logo');
+            if(store.logo) {
+                storeHeaderLogo.src = store.logo;
+                storeHeaderLogo.classList.remove('hidden');
+            }
+
+            navigateTo('store-screen');
+            
+            const menuContainer = document.getElementById('menu-container');
+            menuContainer.innerHTML = store.menu.map(item => `
+                <div class="flex flex-col p-3 bg-gray-50 rounded-2xl border border-gray-100 space-y-3 shadow-sm">
+                    <div class="flex gap-3 items-center">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover border border-gray-200/60 shadow-sm">
+                        <div class="flex-1">
+                            <p class="font-bold text-gray-800 text-xs">${item.name}</p>
+                            <p class="text-orange-600 font-bold text-xs mt-1">${item.price.toLocaleString()} ل.س</p>
+                        </div>
+                    </div>
+                    <!-- حقل إضافة الملاحظة والزر أسفل الصورة والاسم -->
+                    <div class="flex items-center gap-2 pt-1 border-t border-gray-200/40">
+                        <div class="relative flex-1">
+                            <i class="fas fa-pen absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
+                            <input id="note-${item.id}" type="text" placeholder="ملاحظات إضافية (اختياري)..." class="w-full bg-white border border-gray-200 rounded-xl py-1.5 pr-7 pl-2 text-[11px] focus:outline-none focus:border-orange-400 text-gray-700">
+                        </div>
+                        <button onclick="handleAddClick('${item.id}', '${item.name}', ${item.price})" class="bg-orange-500 text-white px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm active:scale-95 transition whitespace-nowrap">إضافة +</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddClick(id, name, price) {
+            const noteInput = document.getElementById(`note-${id}`);
+            const noteText = noteInput ? noteInput.value.trim() : '';
+            
+            addToCart(name, price, noteText);
+            
+            if(noteInput) noteInput.value = ''; // تصفية حقل النص بعد الإضافة
+        }
+
+        function addToCart(name, price, note) {
+            // نميز الوجبة في السلة بناءً على الاسم والملاحظة (مشان إذا طلب نفس الوجبة بملاحظتين مختلفتين ينزلوا منفصلين)
+            const item = cart.find(i => i.name === name && i.note === note);
+            if(item) { item.qty++; } else { cart.push({name, price, qty: 1, note}); }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            
+            const badge = document.getElementById('cart-count-badge');
+            if(totalQty > 0) {
+                badge.innerText = totalQty;
+                badge.classList.remove('hidden');
+                document.getElementById('floating-cart-btn').classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                document.getElementById('floating-cart-btn').classList.add('hidden');
+            }
+            
+            document.getElementById('total-price').innerText = subtotal.toLocaleString() + " ل.س";
+            
+            const cartItemsList = document.getElementById('cart-items-list');
+            cartItemsList.innerHTML = cart.map(item => `
+                <div class="flex flex-col p-3 bg-gray-50 rounded-xl space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold">${item.name} <span class="text-orange-500">x${item.qty}</span></span>
+                        <span class="text-xs font-bold">${(item.price * item.qty).toLocaleString()} ل.س</span>
+                    </div>
+                    ${item.note ? `<p class="text-[10px] text-orange-600 bg-orange-100/40 px-2 py-0.5 rounded font-medium w-fit"><i class="fas fa-comment-dots ml-1"></i>${item.note}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+
+        function confirmOrder() {
+            alert("تم إرسال طلبك بنجاح! سيظهر في قسم الطلبات الحالية.");
+
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const newOrderId = Math.floor(1000 + Math.random() * 9000).toString();
+
+            currentOrders.unshift({
+                id: newOrderId,
+                store: currentActiveStore ? currentActiveStore.name : "متجر تطبيق النبك",
+                total: subtotal,
+                status: 'approved',
+                estimatedTime: '20-30 دقيقة',
+                items: [...cart]
+            });
+
+            renderCurrentOrdersUI();
+            cart = [];
+            updateCartUI();
+            toggleCartModal();
+            navigateTo('home-screen');
+        }
+
+        function filterStores(type) {
+            if (type === 'most-requested') {
+                const allProducts = storesData.flatMap(store =>
+                    store.menu.map(item => ({...item, storeName: store.name, storeId: store.id}))
+                );
+                const shuffled = allProducts.sort(() => Math.random() - 0.5).slice(0, 2);
+                renderStores(shuffled, true);
+            } else {
+                const filtered = storesData.filter(s => s.type === type);
+                renderStores(filtered, false);
+            }
+        }
+
+        // التشغيل الأولي
+        renderStores(storesData, false);
+        renderLocationsUI();
+        renderPastOrdersUI();
+        renderCurrentOrdersUI();
+    </script>
+</body>
+</html>
