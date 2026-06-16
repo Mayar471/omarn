@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-        body { font-family: 'Tajawal', sans-serif; overflow: hidden; }
+        body { font-family: 'Tajawal', sans-serif; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .page-transition { transition: all 0.3s ease-in-out; }
 
@@ -19,6 +19,9 @@
             max-width: 100%;
             border: none;
             border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
 
         /* Tablet (481px to 768px) */
@@ -46,6 +49,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                overflow: hidden;
             }
         }
     </style>
@@ -100,7 +104,7 @@
             </header>
 
             <!-- محتوى الرئيسية -->
-            <main class="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar pb-20">
+            <main class="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar pb-24">
                 <!-- بنر العرض -->
                 <section class="bg-gradient-to-l from-orange-500 to-amber-400 rounded-2xl p-4 text-white relative overflow-hidden">
                     <div class="relative z-10">
@@ -153,7 +157,7 @@
                 <div class="w-10"></div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-20">
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-24">
                 <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 text-center">
                     <div class="w-20 h-20 bg-orange-500 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md shadow-orange-100">أ</div>
                     <h3 class="font-bold text-gray-800 text-base">أحمد النبكي</h3>
@@ -185,7 +189,7 @@
                 <div class="w-10"></div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-20">
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-24">
                 <div id="current-orders-list" class="space-y-3"></div>
             </div>
         </div>
@@ -244,85 +248,85 @@
     <script>
         // داتا المتاجر مع صور الوجبات المحدثة وحقول معالجة الصور
         const storesData = [
-    { 
-        id: 1, 
-        name: "مطعم و استراحةالرصافة", 
-        type: "restaurant", 
-        rating: "4.8", 
-        logo: "images/shop1.jpeg", 
+    {
+        id: 1,
+        name: "مطعم و استراحةالرصافة",
+        type: "restaurant",
+        rating: "4.8",
+        logo: "shop1.jpeg",
         menu: [
-            { id: "m1", name: "وجبة كباب مشوي مع الخضار الطازجة", price: 25000, image: "images/product1.jpeg" }
-        ] 
+            { id: "m1", name: "وجبة كباب مشوي مع الخضار الطازجة", price: 25000, image: "product1.jpeg" }
+        ]
     },
-    { 
-        id: 2, 
-        name: "كرز فريش - Karaz Fresh", 
-        type: "vegetables", 
-        rating: "4.6", 
-        logo: "images/shop2.jpeg", 
+    {
+        id: 2,
+        name: "كرز فريش - Karaz Fresh",
+        type: "vegetables",
+        rating: "4.6",
+        logo: "shop2.jpeg",
         menu: [
-            { id: "m2", name: "عرنوس ذرة صفراء طازج", price: 15000, image: "images/product2.jpeg" }
-        ] 
+            { id: "m2", name: "عرنوس ذرة صفراء طازج", price: 15000, image: "product2.jpeg" }
+        ]
     },
-    { 
-        id: 3, 
-        name: "بوظة أمية - Omaya Ice Cream", 
-        type: "sweets", 
-        rating: "4.9", 
-        logo: "images/shop3.jpeg", 
+    {
+        id: 3,
+        name: "بوظة أمية - Omaya Ice Cream",
+        type: "sweets",
+        rating: "4.9",
+        logo: "shop3.jpeg",
         menu: [
-            { id: "m3", name: "قالب آيس كريم فاخر باللوتس والفراولة", price: 90000, image: "images/product3.jpeg" }
-        ] 
+            { id: "m3", name: "قالب آيس كريم فاخر باللوتس والفراولة", price: 90000, image: "product3.jpeg" }
+        ]
     },
-    { 
-        id: 4, 
-        name: "فول وفتة - Fool & Fatteh", 
-        type: "restaurant", 
-        rating: "4.5", 
-        logo: "images/shop4.jpeg", 
+    {
+        id: 4,
+        name: "فول وفتة - Fool & Fatteh",
+        type: "restaurant",
+        rating: "4.5",
+        logo: "shop4.jpeg",
         menu: [
-            { id: "m4", name: "وجبة فلافل عربي مشكلة مع المخللات والطحينة", price: 18000, image: "images/product4.jpeg" }
-        ] 
+            { id: "m4", name: "وجبة فلافل عربي مشكلة مع المخللات والطحينة", price: 18000, image: "product4.jpeg" }
+        ]
     },
-    { 
-        id: 5, 
-        name: "سناك Better 3", 
-        type: "restaurant", 
-        rating: "4.7", 
-        logo: "images/shop5.jpeg", 
+    {
+        id: 5,
+        name: "سناك Better 3",
+        type: "restaurant",
+        rating: "4.7",
+        logo: "shop5.jpeg",
         menu: [
-            { id: "m5", name: "برجر دجاج مقرمش (زنجر) مع البطاطا والصوص", price: 32000, image: "images/product5.jpeg" }
-        ] 
+            { id: "m5", name: "برجر دجاج مقرمش (زنجر) مع البطاطا والصوص", price: 32000, image: "product5.jpeg" }
+        ]
     },
-    { 
-        id: 6, 
-        name: "تموينات حاج حسين", 
-        type: "supermarket", 
-        rating: "4.4", 
-        logo: "images/shop6.jpeg", 
+    {
+        id: 6,
+        name: "تموينات حاج حسين",
+        type: "supermarket",
+        rating: "4.4",
+        logo: "shop6.jpeg",
         menu: [
-            { id: "m6", name: "ساديا ميني شيف بوب كورن الدجاج", price: 14000, image: "images/product6.jpeg" }
-        ] 
+            { id: "m6", name: "ساديا ميني شيف بوب كورن الدجاج", price: 14000, image: "product6.jpeg" }
+        ]
     },
-    { 
-        id: 7, 
-        name: "مطعم برجر B.", 
-        type: "restaurant", 
-        rating: "4.8", 
-        logo: "images/shop7.jpg", 
+    {
+        id: 7,
+        name: "مطعم برجر B.",
+        type: "restaurant",
+        rating: "4.8",
+        logo: "shop7.jpg",
         menu: [
-            { id: "m7", name: "وجبة برجر لحم دبل كلاسيك بالجبنة الذائبة والصوص", price: 45000, image: "images/product7 (1).png" }
-        ] 
+            { id: "m7", name: "وجبة برجر لحم دبل كلاسيك بالجبنة الذائبة والصوص", price: 45000, image: "product7 (1).png" }
+        ]
     },
-    { 
-        id: 8, 
-        name: "MR.B Perfume", 
-        type: "perfume", 
-        rating: "4.9", 
-        logo: "images/shop8.jpeg", 
+    {
+        id: 8,
+        name: "MR.B Perfume",
+        type: "perfume",
+        rating: "4.9",
+        logo: "shop8.jpeg",
         menu: [
-            { id: "m8", name: "عطر MR.B Perfume Extreme سعة 50 مل", price: 85000, image: "images/product8.jpeg" }
-        ] 
+            { id: "m8", name: "عطر MR.B Perfume Extreme سعة 50 مل", price: 85000, image: "product8.jpeg" }
+        ]
     }
 ];
 
